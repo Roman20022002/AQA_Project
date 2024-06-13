@@ -1,5 +1,5 @@
 import numpy as np
-from function_evaluation import func_and_deriv
+from function_evaluation2 import func_and_deriv
 
 def MSE(f, df, x, val, lamb=8, k=0.1):
     a = df + lamb*f*(k + np.tan(lamb*x))
