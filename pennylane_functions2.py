@@ -130,7 +130,7 @@ def MSE(f, df, x, val, lamb=8, k=0.1):
     loss = (a-b)**2
     return loss
 
-def u(x, x0, u0, kappa, lam):
+def u(x, x0, u0, kappa, lam=8):
     u_tilde = np.exp(-kappa*lam*x0)*np.cos(lam*x0)
     const = u0 - u_tilde
     return np.exp(-kappa*lam*x)*np.cos(lam*x) + const
@@ -138,7 +138,7 @@ def u(x, x0, u0, kappa, lam):
 def lin_reg(i, epochs):
     return 1 - i/epochs
 
-def reg_loss(x, num_qubits, theta, l, n_iter, epochs, x0=0, u0=1, kappa=0.1, lam=20, step = 4):
+def reg_loss(x, num_qubits, theta, l, n_iter, epochs, x0=0, u0=1, kappa=0.1, lam=8, step = 4):
     sigm = lin_reg(n_iter, epochs)
     x_reg = x[::step]
 

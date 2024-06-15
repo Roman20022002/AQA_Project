@@ -118,7 +118,7 @@ def func_and_deriv(x, num_qubits, theta, l):
     df = []
 
     for i in x:
-        f.append(f_func(i,num_qubits,theta,l))
+        f.append(f_func(i,num_qubits,theta,l) + (1-f_func(0, num_qubits, theta, l))) 
         df.append(df_func(i,num_qubits,theta,l))
 
     return np.array(f), np.array(df)
@@ -130,7 +130,7 @@ def MSE(f, df, x, val, lamb=8, k=0.1):
     loss = (a-b)**2
     return loss
 
-def u(x, x0, u0, kappa, lam):
+def u(x, x0, u0, kappa, lam=8):
     u_tilde = np.exp(-kappa*lam*x0)*np.cos(lam*x0)
     const = u0 - u_tilde
     return np.exp(-kappa*lam*x)*np.cos(lam*x) + const
@@ -138,7 +138,7 @@ def u(x, x0, u0, kappa, lam):
 def lin_reg(i, epochs):
     return 1 - i/epochs
 
-def reg_loss(x, num_qubits, theta, l, n_iter, epochs, x0=0, u0=1, kappa=0.1, lam=20, step = 4):
+def reg_loss(x, num_qubits, theta, l, n_iter, epochs, x0=0, u0=1, kappa=0.1, lam=8, step = 4):
     sigm = lin_reg(n_iter, epochs)
     x_reg = x[::step]
 
@@ -150,14 +150,14 @@ def reg_loss(x, num_qubits, theta, l, n_iter, epochs, x0=0, u0=1, kappa=0.1, lam
     return np.sum(loss_array)
 
 def diff_loss(f, df, x):
-    loss = np.mean(MSE(f, df, x, val=0))
+    loss = np.sum(MSE(f, df, x, val=0)) / len(x)
     return loss
 
-def boundary_loss(f0, u0=1, nabla=10):
+def boundary_loss(f0, u0=1, nabla=2):
     loss = nabla*(f0-u0)**2
     return loss
 
 def loss_function(x,num_qubits, theta, l, n_iter, epochs):
     f, df = func_and_deriv(x,num_qubits, theta, l)
-    loss = diff_loss(f, df, x) + boundary_loss(f[0]) + reg_loss(x, num_qubits, theta, l, n_iter, epochs)
+    loss = diff_loss(f, df, x) #+ reg_loss(x, num_qubits, theta, l, n_iter, epochs) #+ boundary_loss(f[0]) 
     return loss
