@@ -81,7 +81,7 @@ def f_func(x,num_qubits,theta, l):
     label = 0
     dev = qml.device('default.qubit', wires=list(range(num_qubits)))
     circuit = qml.QNode(build_circuit, dev)
-    result = circuit(x, num_qubits, label, theta, l)
+    result = (circuit(x, num_qubits, label, theta, l)+1)/2
     # qml.drawer.use_style('black_white')
     # fig, ax = qml.draw_mpl(circuit)(x, num_qubits, label, theta, l)
     # plt.show()
@@ -97,7 +97,7 @@ def df_func(x,num_qubits,theta,l):
         if i <= num_qubits:
             dev = qml.device('default.qubit', wires=list(range(num_qubits)))
             circuit = qml.QNode(build_circuit, dev)
-            result = circuit(x, num_qubits, i, theta, l)
+            result = (circuit(x, num_qubits, i, theta, l)+1/2)
             # qml.drawer.use_style('black_white')
             # fig, ax = qml.draw_mpl(circuit)(x, num_qubits, i, theta, l)
             # plt.show()
@@ -105,7 +105,7 @@ def df_func(x,num_qubits,theta,l):
         else:
             dev = qml.device('default.qubit', wires=list(range(num_qubits)))
             circuit = qml.QNode(build_circuit, dev)
-            result = circuit(x, num_qubits, i, theta, l)
+            result = (circuit(x, num_qubits, i, theta, l)+1)/2
             # qml.drawer.use_style('black_white')
             # fig, ax = qml.draw_mpl(circuit)(x, num_qubits, i, theta, l)
             # plt.show()
@@ -118,7 +118,7 @@ def func_and_deriv(x, num_qubits, theta, l):
     df = []
 
     for i in x:
-        f.append(f_func(i,num_qubits,theta,l) + (1-f_func(0, num_qubits, theta, l))) 
+        f.append(f_func(i,num_qubits,theta,l) + 1 - f_func(0, num_qubits, theta, l))
         df.append(df_func(i,num_qubits,theta,l))
 
     return np.array(f), np.array(df)
@@ -150,7 +150,7 @@ def reg_loss(x, num_qubits, theta, l, n_iter, epochs, x0=0, u0=1, kappa=0.1, lam
     return np.sum(loss_array)
 
 def diff_loss(f, df, x):
-    loss = np.sum(MSE(f, df, x, val=0)) / len(x)
+    loss = np.mean(MSE(f, df, x, val=0))
     return loss
 
 def boundary_loss(f0, u0=1, nabla=2):
@@ -159,5 +159,5 @@ def boundary_loss(f0, u0=1, nabla=2):
 
 def loss_function(x,num_qubits, theta, l, n_iter, epochs):
     f, df = func_and_deriv(x,num_qubits, theta, l)
-    loss = diff_loss(f, df, x) #+ reg_loss(x, num_qubits, theta, l, n_iter, epochs) #+ boundary_loss(f[0]) 
+    loss = diff_loss(f, df, x) + reg_loss(x, num_qubits, theta, l, n_iter, epochs) # + boundary_loss(f[0]) 
     return loss
