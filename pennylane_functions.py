@@ -97,7 +97,7 @@ def df_func(x,num_qubits,theta,l):
         if i <= num_qubits:
             dev = qml.device('default.qubit', wires=list(range(num_qubits)))
             circuit = qml.QNode(build_circuit, dev)
-            result = (circuit(x, num_qubits, i, theta, l)+1/2)
+            result = circuit(x, num_qubits, i, theta, l)
             # qml.drawer.use_style('black_white')
             # fig, ax = qml.draw_mpl(circuit)(x, num_qubits, i, theta, l)
             # plt.show()
